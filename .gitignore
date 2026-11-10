@@ -1,0 +1,39 @@
+# Local environment files (keep templates versioned)
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Node.js dependencies and logs
+node_modules/
+.npm/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Generated builds and test coverage
+build/
+dist/
+coverage/
+.nyc_output/
+
+# Flutter / Dart generated files
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+app.*.symbols
+app.*.map.json
+
+# Local IDE and operating system files
+.idea/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
