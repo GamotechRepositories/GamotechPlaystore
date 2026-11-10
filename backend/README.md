@@ -98,3 +98,14 @@ The verified token identifies the user; records are filtered by that user's
 wallet. Caller-supplied user and wallet IDs do not select another account.
 Missing/expired/invalid tokens return 401, a missing wallet 404, malformed page
 400, and service/database failures 503/500. Responses disable caching.
+
+### Daily bonus
+
+`GET /api/v1/wallet/daily-bonus` returns `{ amount, claimed, nextClaimAt }`.
+`POST /api/v1/wallet/daily-bonus/claim` credits the authenticated user's wallet
+and creates a `bonus` credit record in one MongoDB transaction, returning the
+updated `{ wallet, amount, claimed, nextClaimAt }`. Both require the sign-in
+Bearer token. The server selects the amount; request amounts are ignored.
+`DAILY_BONUS_PAISE` defaults to `10000` (₹100). Claims reset at midnight India time.
+A unique wallet-and-day record reference prevents duplicate awards; repeat
+claims return 409. Missing wallets return 404. MongoDB must support transactions.

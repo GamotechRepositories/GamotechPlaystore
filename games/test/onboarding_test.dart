@@ -56,8 +56,7 @@ void main() {
           (widget) =>
               widget is Image &&
               widget.image is AssetImage &&
-              (widget.image as AssetImage).assetName ==
-                  'assets/images/frd.png',
+              (widget.image as AssetImage).assetName == 'assets/images/frd.png',
         ),
       );
       expect(friendsImage.semanticLabel, contains('Friends'));
@@ -118,33 +117,38 @@ void main() {
     );
   });
 
-  testWidgets(
-    'swipes between slides and uses page indicators without completing onboarding',
-    (tester) async {
-      await tester.pumpWidget(const MyApp(showOnboarding: true));
-      await tester.pumpAndSettle();
-      await tester.drag(find.byType(PageView), const Offset(-700, 0));
-      await tester.pumpAndSettle();
-      expect(find.text('Play with\nFriends Online'), findsOneWidget);
-      await tester.drag(find.byType(PageView), const Offset(-700, 0));
-      await tester.pumpAndSettle();
-      expect(find.text('Join Tournaments\n& Win Big'), findsOneWidget);
-      expect(await const OnboardingService().isCompleted(), isFalse);
-      await tester.ensureVisible(control(2, 'onboarding-dot-0'));
-      await tester.tap(control(2, 'onboarding-dot-0'));
-      await tester.pumpAndSettle();
-      expect(find.text('Play Your\nFavourite Games'), findsOneWidget);
-      expect(await const OnboardingService().isCompleted(), isFalse);
-      await tester.ensureVisible(control(0, 'onboarding-dot-2'));
-      await tester.tap(control(0, 'onboarding-dot-2'));
-      await tester.pumpAndSettle();
-      await tester.ensureVisible(control(2, 'Get Started'));
-      await tester.tap(control(2, 'Get Started'));
-      await tester.pumpAndSettle();
-      expect(find.byType(LoginScreen), findsOneWidget);
-      expect(await const OnboardingService().isCompleted(), isTrue);
-    },
-  );
+  testWidgets('slides advance only through Next and Get Started', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const MyApp(showOnboarding: true));
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(PageView), const Offset(-700, 0));
+    await tester.pumpAndSettle();
+    expect(find.text('Play Your\nFavourite Games'), findsOneWidget);
+    await tester.ensureVisible(control(0, 'onboarding-dot-2'));
+    await tester.tap(control(0, 'onboarding-dot-2'));
+    await tester.pumpAndSettle();
+    expect(find.text('Play Your\nFavourite Games'), findsOneWidget);
+    final background = tester
+        .widgetList<Image>(find.byType(Image))
+        .firstWhere(
+          (image) =>
+              (image.image as AssetImage).assetName.contains('Wallpaper'),
+        );
+    expect(background.opacity!.value, 0.30);
+    await nextSlide(tester);
+    expect(find.text('Play with\nFriends Online'), findsOneWidget);
+    await tester.drag(find.byType(PageView), const Offset(700, 0));
+    await tester.pumpAndSettle();
+    expect(find.text('Play with\nFriends Online'), findsOneWidget);
+    await nextSlide(tester, from: 1);
+    expect(await const OnboardingService().isCompleted(), isFalse);
+    await tester.ensureVisible(control(2, 'Get Started'));
+    await tester.tap(control(2, 'Get Started'));
+    await tester.pumpAndSettle();
+    expect(find.byType(LoginScreen), findsOneWidget);
+    expect(await const OnboardingService().isCompleted(), isTrue);
+  });
 
   for (final size in [
     const Size(320, 568),

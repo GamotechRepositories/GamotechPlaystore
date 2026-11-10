@@ -57,6 +57,34 @@ void main() {
     expect(service.calls, 1);
   });
 
+  testWidgets(
+    'auto advances after four seconds and supports pause and manual navigation',
+    (tester) async {
+      final service = TestBannerService(() async => banners);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(body: HomeBannerCarousel(bannerService: service)),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('1 / 2'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 4));
+      await tester.pumpAndSettle();
+      expect(find.text('2 / 2'), findsOneWidget);
+      await tester.tap(find.byTooltip('Pause auto-scroll'));
+      await tester.pump(const Duration(seconds: 5));
+      expect(find.text('2 / 2'), findsOneWidget);
+      await tester.tap(find.byTooltip('Next banner'));
+      await tester.pumpAndSettle();
+      expect(find.text('1 / 2'), findsOneWidget);
+      await tester.tap(find.byTooltip('Resume auto-scroll'));
+      await tester.pump(const Duration(seconds: 4));
+      await tester.pumpAndSettle();
+      expect(find.text('2 / 2'), findsOneWidget);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+
   testWidgets('shows an error, retries, and handles an empty collection', (
     tester,
   ) async {
@@ -109,8 +137,10 @@ void main() {
     await tester.tap(find.byTooltip('Next banner'));
     await tester.pumpAndSettle();
     expect(find.text('2 / 2'), findsOneWidget);
-    await tester.ensureVisible(find.text('Sign out'));
-    expect(find.text('Welcome, player1!'), findsOneWidget);
+    expect(find.text('Sign out'), findsNothing);
+    expect(find.text('You’re signed in and ready to play.'), findsNothing);
+    expect(find.text('player1'), findsOneWidget);
+    expect(find.text('Welcome, player1!'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 }

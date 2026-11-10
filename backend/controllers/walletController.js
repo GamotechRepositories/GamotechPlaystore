@@ -5,19 +5,8 @@ import WalletRecord from '../models/WalletRecord.js';
 
 export const getWallet = async (req, res) => {
   res.set('Cache-Control', 'no-store');
-  if (!process.env.JWT_SECRET) return res.status(503).json({ message: 'Wallet is temporarily unavailable' });
-  let subject;
-  try {
-    const match = /^Bearer (\S+)$/.exec(req.get('Authorization') ?? '');
-    if (!match) throw new Error('Missing token');
-    const payload = jwt.verify(match[1], process.env.JWT_SECRET, {
-      algorithms: ['HS256'], issuer: 'gamotech', audience: 'gamotech-app',
-    });
-    subject = payload.sub;
-    if (typeof subject !== 'string' || !mongoose.isObjectIdOrHexString(subject)) throw new Error('Invalid user');
-  } catch {
-    return res.status(401).json({ message: 'Your session has expired. Please sign in again.' });
-  }
+  const subject = authenticateWalletUser(req, res);
+  if (!subject) return;
   const page = req.query.page ?? '1';
   if (typeof page !== 'string' || !/^[1-9]\d{0,5}$/.test(page)) {
     return res.status(400).json({ message: 'Invalid history page' });
@@ -35,4 +24,22 @@ export const getWallet = async (req, res) => {
   } catch {
     return res.status(500).json({ message: 'Unable to load your wallet. Please try again.' });
   }
+};
+
+export const authenticateWalletUser = (req, res) => {
+  if (!process.env.JWT_SECRET) { res.status(503).json({ message: 'Wallet is temporarily unavailable' }); return null; }
+  let subject;
+  try {
+    const match = /^Bearer (\S+)$/.exec(req.get('Authorization') ?? '');
+    if (!match) throw new Error('Missing token');
+    const payload = jwt.verify(match[1], process.env.JWT_SECRET, {
+      algorithms: ['HS256'], issuer: 'gamotech', audience: 'gamotech-app',
+    });
+    subject = payload.sub;
+    if (typeof subject !== 'string' || !mongoose.isObjectIdOrHexString(subject)) throw new Error('Invalid user');
+  } catch {
+    res.status(401).json({ message: 'Your session has expired. Please sign in again.' });
+    return null;
+  }
+  return subject;
 };

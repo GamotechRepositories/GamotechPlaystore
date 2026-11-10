@@ -277,13 +277,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           child: SizedBox(
             width: 28,
             height: 48,
-            child: TextButton(
+            child: Center(
               key: ValueKey('onboarding-dot-$index'),
-              onPressed: _saving ? null : () => _goToPage(index),
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                shape: const CircleBorder(),
-              ),
               child: Container(
                 width: selected ? 11 : 7,
                 height: selected ? 11 : 7,
@@ -373,7 +368,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Image.asset(
             'assets/images/Crimson Gold Lightwave Wallpaper.png',
             fit: BoxFit.cover,
-            opacity: const AlwaysStoppedAnimation(0.75),
+            opacity: const AlwaysStoppedAnimation(0.30),
             excludeFromSemantics: true,
           ),
           SafeArea(
@@ -381,7 +376,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               builder: (context, viewport) => PageView.builder(
                 controller: _pageController,
                 itemCount: _slideLabels.length,
-                physics: _saving ? const NeverScrollableScrollPhysics() : null,
+                physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: (page) => setState(() => _currentPage = page),
                 itemBuilder: (context, index) => _slide(index, viewport),
               ),

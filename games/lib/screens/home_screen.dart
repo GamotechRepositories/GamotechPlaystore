@@ -4,6 +4,7 @@ import '../services/auth_service.dart';
 import '../services/banner_service.dart';
 import '../services/wallet_service.dart';
 import '../widgets/home_banner_carousel.dart';
+import '../widgets/daily_bonus_card.dart';
 import 'wallet_screen.dart';
 import 'profile_screen.dart';
 
@@ -129,8 +130,19 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           IconButton(
             tooltip: 'Profile',
-            onPressed: () =>
-                _openPage(context, ProfileScreen(session: session)),
+            onPressed: () async {
+              final signOut = await Navigator.of(context).push<bool>(
+                MaterialPageRoute(
+                  builder: (_) => Theme(
+                    data: Theme.of(context),
+                    child: ProfileScreen(session: session),
+                  ),
+                ),
+              );
+              if (signOut == true && context.mounted) {
+                Navigator.of(context).pop();
+              }
+            },
             icon: const Icon(Icons.account_circle_rounded),
           ),
           const SizedBox(width: 8),
@@ -139,44 +151,20 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 960),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    'Welcome, ${session.username}!',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    session.email,
-                    style: TextStyle(color: colors.onSurfaceVariant),
-                  ),
-                  const SizedBox(height: 24),
                   HomeBannerCarousel(bannerService: bannerService),
                   const SizedBox(height: 24),
-                  const Text('You’re signed in and ready to play.'),
-                  const SizedBox(height: 24),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: TextButton.icon(
-                      style: TextButton.styleFrom(
-                        backgroundColor: colors.primary,
-                        foregroundColor: colors.onPrimary,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 14,
-                        ),
-                      ),
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.logout_rounded),
-                      label: const Text('Sign out'),
-                    ),
+                  DailyBonusCard(
+                    token: session.token,
+                    onBalanceChanged: (balance) {
+                      if (mounted) setState(() => _balance = balance);
+                    },
                   ),
                 ],
               ),

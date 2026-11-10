@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../services/banner_service.dart';
@@ -15,15 +17,37 @@ class _HomeBannerCarouselState extends State<HomeBannerCarousel> {
   final _controller = PageController();
   late Future<List<HomeBanner>> _banners;
   int _currentPage = 0;
+  int _bannerCount = 0;
+  Timer? _autoScrollTimer;
+  bool _paused = false;
+
+  void _scheduleAutoScroll() {
+    _autoScrollTimer?.cancel();
+    _autoScrollTimer = Timer(const Duration(seconds: 4), () {
+      if (!mounted) return;
+      if (!_paused &&
+          _bannerCount > 1 &&
+          _controller.hasClients &&
+          !_controller.position.isScrollingNotifier.value &&
+          TickerMode.valuesOf(context).enabled &&
+          ModalRoute.of(context)?.isCurrent != false &&
+          !MediaQuery.disableAnimationsOf(context)) {
+        _changePage((_currentPage + 1) % _bannerCount);
+      }
+      _scheduleAutoScroll();
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     _banners = (widget.bannerService ?? BannerService()).fetchHomeBanners();
+    _scheduleAutoScroll();
   }
 
   @override
   void dispose() {
+    _autoScrollTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -73,6 +97,7 @@ class _HomeBannerCarouselState extends State<HomeBannerCarousel> {
                   TextButton.icon(
                     onPressed: () => setState(() {
                       _currentPage = 0;
+                      _bannerCount = 0;
                       _banners = (widget.bannerService ?? BannerService())
                           .fetchHomeBanners();
                     }),
@@ -85,6 +110,7 @@ class _HomeBannerCarouselState extends State<HomeBannerCarousel> {
           );
         }
         final banners = snapshot.data!;
+        _bannerCount = banners.length;
         if (banners.isEmpty) return const SizedBox.shrink();
 
         return Column(
@@ -99,8 +125,10 @@ class _HomeBannerCarouselState extends State<HomeBannerCarousel> {
                   child: PageView.builder(
                     controller: _controller,
                     itemCount: banners.length,
-                    onPageChanged: (page) =>
-                        setState(() => _currentPage = page),
+                    onPageChanged: (page) {
+                      setState(() => _currentPage = page);
+                      _scheduleAutoScroll();
+                    },
                     itemBuilder: (context, index) {
                       final banner = banners[index];
                       return Image.network(
@@ -157,6 +185,18 @@ class _HomeBannerCarouselState extends State<HomeBannerCarousel> {
                     onPressed: () =>
                         _changePage((_currentPage + 1) % banners.length),
                     icon: const Icon(Icons.chevron_right_rounded),
+                  ),
+                  IconButton(
+                    tooltip: _paused
+                        ? 'Resume auto-scroll'
+                        : 'Pause auto-scroll',
+                    onPressed: () {
+                      setState(() => _paused = !_paused);
+                      _scheduleAutoScroll();
+                    },
+                    icon: Icon(
+                      _paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
+                    ),
                   ),
                 ],
               ),

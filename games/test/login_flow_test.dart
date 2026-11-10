@@ -62,7 +62,9 @@ void main() {
     await tester.ensureVisible(find.text('Sign in'));
     await tester.tap(find.text('Sign in'));
     await tester.pumpAndSettle();
-    expect(find.text('Welcome, player1!'), findsOneWidget);
+    expect(find.text('player1'), findsOneWidget);
+    await tester.tap(find.byTooltip('Profile'));
+    await tester.pumpAndSettle();
     expect(find.text('player@example.com'), findsOneWidget);
     await tester.tap(find.text('Sign out'));
     await tester.pumpAndSettle();
@@ -100,6 +102,6 @@ void main() {
     await tester.ensureVisible(find.text('Sign in'));
     await tester.tap(find.text('Sign in'));
     await tester.pumpAndSettle();
-    expect(find.text('Welcome, player1!'), findsOneWidget);
+    expect(find.text('player1'), findsOneWidget);
   });
 }
