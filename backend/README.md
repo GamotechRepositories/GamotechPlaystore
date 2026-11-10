@@ -88,3 +88,13 @@ change a wallet's balance. Any future credit/debit service must update the balan
 and insert its record in the same transaction, with a sufficient-balance condition
 for debits. This change adds the data models and registration provisioning;
 deposit/withdrawal endpoints are not part of it.
+
+### Read the signed-in wallet and history
+
+`GET /api/v1/wallet?page=1` requires `Authorization: Bearer <sign-in token>`.
+Returns `{ wallet: { balance, currency }, records: [...], page, hasMore }`.
+All amounts are integer paise. Records are sorted newest first, 20 per page.
+The verified token identifies the user; records are filtered by that user's
+wallet. Caller-supplied user and wallet IDs do not select another account.
+Missing/expired/invalid tokens return 401, a missing wallet 404, malformed page
+400, and service/database failures 503/500. Responses disable caching.

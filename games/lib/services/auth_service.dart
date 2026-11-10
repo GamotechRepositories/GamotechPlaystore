@@ -16,10 +16,16 @@ class AuthSession {
     required this.token,
     required this.username,
     required this.email,
+    this.walletBalance,
   });
   final String token;
   final String username;
   final String email;
+  final int? walletBalance;
+
+  String get formattedBalance => walletBalance == null
+      ? 'Unavailable'
+      : '₹${(walletBalance! / 100).toStringAsFixed(2)}';
 }
 
 class AuthService {
@@ -62,6 +68,13 @@ class AuthService {
       token: body['token'] as String,
       username: user['username'] as String,
       email: user['email'] as String,
+      walletBalance:
+          body['wallet'] is Map &&
+              body['wallet']['currency'] == 'INR' &&
+              body['wallet']['balance'] is int &&
+              (body['wallet']['balance'] as int) >= 0
+          ? body['wallet']['balance'] as int
+          : null,
     );
   }
 

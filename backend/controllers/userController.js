@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import Wallet from "../models/Wallet.js";
 import jwt from "jsonwebtoken";
 import { registerUser } from "../services/registrationService.js";
 
@@ -63,6 +64,8 @@ export const signIn = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
+    const wallet = await Wallet.findOne({ user: user._id });
+
     const token = jwt.sign({}, process.env.JWT_SECRET, {
       subject: user._id.toString(),
       algorithm: "HS256",
@@ -74,6 +77,7 @@ export const signIn = async (req, res) => {
     return res.status(200).json({
       message: "Signed in successfully",
       token,
+      wallet: wallet ? { balance: wallet.balance, currency: wallet.currency } : null,
       user: user.toJSON(),
     });
   } catch (_) {

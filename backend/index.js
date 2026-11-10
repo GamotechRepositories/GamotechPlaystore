@@ -1,3 +1,4 @@
+import walletRoute from './routes/walletRoute.js';
 import express from "express";
 import dotenv from "dotenv";
 import connect from "./config/db.js";
@@ -12,6 +13,7 @@ const app = express();
 app.use(corsMiddleware);
 app.use(express.json());
 app.use("/api/v1", userRoute);
+app.use("/api/v1", walletRoute);
 app.use("/api/v1", homeBannerRoute);
 
 app.get("/", (req, res) => {
