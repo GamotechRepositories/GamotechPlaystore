@@ -10,7 +10,7 @@ class AccountScreen extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('gamotech'),
+        title: const Text('123Games'),
         automaticallyImplyLeading: false,
       ),
       body: SafeArea(
@@ -33,7 +33,7 @@ class AccountScreen extends StatelessWidget {
                     'Welcome, ${session.username}!',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      fontSize: 32,
+                      fontSize: 18,
                       fontWeight: FontWeight.w800,
                     ),
                   ),

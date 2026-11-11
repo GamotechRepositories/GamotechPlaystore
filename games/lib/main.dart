@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       brightness: Brightness.dark,
     );
     return MaterialApp(
-      title: 'Gamotech',
+      title: '123Games',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
@@ -31,6 +31,17 @@ class MyApp extends StatelessWidget {
         textTheme: ThemeData.dark().textTheme.apply(
           bodyColor: const Color(0xFFF9F5FF),
           displayColor: const Color(0xFFF9F5FF),
+        ).copyWith(
+          displayLarge: const TextStyle(fontSize: 18),
+          displayMedium: const TextStyle(fontSize: 18),
+          displaySmall: const TextStyle(fontSize: 18),
+          headlineLarge: const TextStyle(fontSize: 18),
+          headlineMedium: const TextStyle(fontSize: 18),
+          headlineSmall: const TextStyle(fontSize: 18),
+          titleLarge: const TextStyle(fontSize: 18),
+        ),
+        appBarTheme: const AppBarTheme(
+          titleTextStyle: TextStyle(fontSize: 18),
         ),
         scaffoldBackgroundColor: const Color(0xFF190C30),
         inputDecorationTheme: InputDecorationTheme(

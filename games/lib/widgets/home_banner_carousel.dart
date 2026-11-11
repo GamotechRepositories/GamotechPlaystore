@@ -19,14 +19,12 @@ class _HomeBannerCarouselState extends State<HomeBannerCarousel> {
   int _currentPage = 0;
   int _bannerCount = 0;
   Timer? _autoScrollTimer;
-  bool _paused = false;
 
   void _scheduleAutoScroll() {
     _autoScrollTimer?.cancel();
     _autoScrollTimer = Timer(const Duration(seconds: 4), () {
       if (!mounted) return;
-      if (!_paused &&
-          _bannerCount > 1 &&
+      if (_bannerCount > 1 &&
           _controller.hasClients &&
           !_controller.position.isScrollingNotifier.value &&
           TickerMode.valuesOf(context).enabled &&
@@ -163,42 +161,28 @@ class _HomeBannerCarouselState extends State<HomeBannerCarousel> {
               ),
             ),
             if (banners.length > 1)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    tooltip: 'Previous banner',
-                    onPressed: () => _changePage(
-                      (_currentPage - 1 + banners.length) % banners.length,
-                    ),
-                    icon: const Icon(Icons.chevron_left_rounded),
-                  ),
-                  Flexible(
-                    child: Text(
-                      '${_currentPage + 1} / ${banners.length}',
-                      semanticsLabel:
-                          'Banner ${_currentPage + 1} of ${banners.length}',
-                    ),
-                  ),
-                  IconButton(
-                    tooltip: 'Next banner',
-                    onPressed: () =>
-                        _changePage((_currentPage + 1) % banners.length),
-                    icon: const Icon(Icons.chevron_right_rounded),
-                  ),
-                  IconButton(
-                    tooltip: _paused
-                        ? 'Resume auto-scroll'
-                        : 'Pause auto-scroll',
-                    onPressed: () {
-                      setState(() => _paused = !_paused);
-                      _scheduleAutoScroll();
-                    },
-                    icon: Icon(
-                      _paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Semantics(
+                  label: 'Banner ${_currentPage + 1} of ${banners.length}',
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      banners.length,
+                      (index) => Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: index == _currentPage
+                              ? colors.secondary
+                              : colors.onSurfaceVariant.withValues(alpha: 0.35),
+                        ),
+                      ),
                     ),
                   ),
-                ],
+                ),
               ),
           ],
         );

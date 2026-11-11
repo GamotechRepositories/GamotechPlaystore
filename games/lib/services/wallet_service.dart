@@ -25,7 +25,7 @@ class WalletData {
   final int balance;
   final List<WalletActivity> records;
   final bool hasMore;
-  String get formattedBalance => '₹${(balance / 100).toStringAsFixed(2)}';
+  String get formattedBalance => '${(balance / 100).toStringAsFixed(2)} coins';
 }
 
 class WalletService {

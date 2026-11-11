@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../services/auth_service.dart';
 import '../services/banner_service.dart';
 import '../services/wallet_service.dart';
 import '../widgets/home_banner_carousel.dart';
 import '../widgets/daily_bonus_card.dart';
+import '../widgets/home_games_section.dart';
 import 'wallet_screen.dart';
 import 'profile_screen.dart';
 
@@ -99,32 +101,118 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildHome(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return Scaffold(
+      backgroundColor: const Color(0xFF080808),
       appBar: AppBar(
-        title: Text(session.username, overflow: TextOverflow.ellipsis),
-        actions: [
-          TextButton.icon(
-            onPressed: () => _openPage(
-              context,
-              WalletScreen(
-                session: session,
-                onBalanceChanged: (balance) {
-                  if (mounted) setState(() => _balance = balance);
-                },
+        titleSpacing: 12,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              session.username,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 14),
+            ),
+            InkWell(
+              onTap: () => _openPage(
+                context,
+                WalletScreen(
+                  session: session,
+                  onBalanceChanged: (balance) {
+                    if (mounted) setState(() => _balance = balance);
+                  },
+                ),
               ),
-            ),
-            icon: Icon(
-              Icons.account_balance_wallet_rounded,
-              color: colors.secondary,
-            ),
-            label: SizedBox(
-              width: 96,
               child: Text(
                 _balance == null
                     ? 'Unavailable'
-                    : '₹${(_balance! / 100).toStringAsFixed(2)}',
+                    : '${(_balance! / 100).toStringAsFixed(2)} coins',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: colors.secondary),
+                style: TextStyle(color: colors.secondary, fontSize: 11),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          SizedBox(
+            width: 144,
+            child: FilledButton(
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(0, 32),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 4,
+                ),
+              ),
+              onPressed: () => showModalBottomSheet<void>(
+                context: context,
+                isScrollControlled: true,
+                builder: (_) => SafeArea(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Get Coins',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Coins are for playing only and have no cash value.',
+                        ),
+                        const SizedBox(height: 16),
+                        for (final price in [
+                          100,
+                          200,
+                          300,
+                          400,
+                          500,
+                          600,
+                          700,
+                          800,
+                          900,
+                          1000,
+                        ])
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: SvgPicture.asset(
+                              'assets/icons/coin.svg',
+                              width: 24,
+                              height: 24,
+                            ),
+                            title: Text('${price * 10} coins'),
+                            trailing: Text('₹$price'),
+                          ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Purchases will be available when Google Play Billing is connected.',
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/coin.svg',
+                    width: 20,
+                    height: 20,
+                    excludeFromSemantics: true,
+                  ),
+                  const SizedBox(width: 6),
+                  const Flexible(
+                    child: Text(
+                      'Get Coins +',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -166,6 +254,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (mounted) setState(() => _balance = balance);
                     },
                   ),
+                  const SizedBox(height: 12),
+                  const HomeGamesSection(),
                 ],
               ),
             ),

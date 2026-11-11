@@ -105,8 +105,8 @@ class _WalletScreenState extends State<WalletScreen> {
                               const SizedBox(height: 8),
                               Text(
                                 _error != null && _data != null
-                                    ? 'Last loaded balance • INR'
-                                    : 'Available balance • INR',
+                                    ? 'Last loaded balance • Coins'
+                                    : 'Available balance • Coins',
                               ),
                             ],
                           ),
@@ -152,7 +152,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  '${record.type == 'credit' ? '+' : '−'}₹${(record.amount / 100).toStringAsFixed(2)}',
+                                  '${record.type == 'credit' ? '+' : '−'}${(record.amount / 100).toStringAsFixed(2)} coins',
                                   style: const TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,

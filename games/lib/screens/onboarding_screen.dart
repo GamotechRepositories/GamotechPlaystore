@@ -147,7 +147,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               'Play Your\nFavourite Games',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: (width * 0.097).clamp(28, 52),
+                fontSize: 18,
                 height: 1.08,
                 fontWeight: FontWeight.w900,
                 fontStyle: FontStyle.italic,
@@ -194,7 +194,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           'Play with\nFriends Online',
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: (width * 0.105).clamp(30, 48),
+            fontSize: 18,
             height: 1.1,
             color: const Color(0xFFFFF8E7),
             fontWeight: FontWeight.w900,
@@ -246,7 +246,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: (width * 0.09).clamp(27, 46),
+            fontSize: 18,
             height: 1.1,
             color: const Color(0xFFFFF8E7),
             fontWeight: FontWeight.w900,

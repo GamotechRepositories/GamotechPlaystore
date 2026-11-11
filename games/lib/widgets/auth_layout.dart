@@ -217,7 +217,7 @@ class _AuthHero extends StatelessWidget {
         textAlign: TextAlign.center,
         style: TextStyle(
           color: const Color(0xFFFFF0D5),
-          fontSize: keyboardOpen ? 25 : 30,
+          fontSize: 18,
           fontWeight: FontWeight.w900,
           fontStyle: FontStyle.italic,
           height: 1.1,

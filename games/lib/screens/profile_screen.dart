@@ -9,7 +9,10 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      backgroundColor: const Color(0xFF080808),
+      appBar: AppBar(
+        title: const Text('Profile', style: TextStyle(fontSize: 18)),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -57,6 +60,11 @@ class ProfileScreen extends StatelessWidget {
                   const SizedBox(height: 24),
                   FilledButton.icon(
                     style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(44),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       backgroundColor: colors.primary,
                       foregroundColor: colors.onPrimary,
                     ),

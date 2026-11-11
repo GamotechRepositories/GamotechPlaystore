@@ -25,7 +25,7 @@ class AuthSession {
 
   String get formattedBalance => walletBalance == null
       ? 'Unavailable'
-      : '₹${(walletBalance! / 100).toStringAsFixed(2)}';
+      : '${(walletBalance! / 100).toStringAsFixed(2)} coins';
 }
 
 class AuthService {

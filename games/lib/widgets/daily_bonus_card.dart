@@ -105,9 +105,13 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
         (!_claimed ||
             (_nextClaim != null && DateTime.now().isAfter(_nextClaim!)));
     return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Color(0xFF141414), width: 1.5),
+      ),
       margin: EdgeInsets.zero,
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -116,7 +120,7 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
                 Icon(
                   Icons.card_giftcard_rounded,
                   color: colors.secondary,
-                  size: 32,
+                  size: 24,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -125,16 +129,17 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       color: colors.secondary,
                       fontWeight: FontWeight.bold,
+                      fontSize: 18,
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 6),
             Text(
               _amount == null
                   ? 'Come back each day for a wallet bonus.'
-                  : 'Claim ₹${(_amount! / 100).toStringAsFixed(2)} for your wallet each day.',
+                  : 'Claim ${(_amount! / 100).toStringAsFixed(2)} coins for your wallet each day.',
             ),
             if (_claimed && !canClaim) ...[
               const SizedBox(height: 8),
@@ -144,8 +149,15 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
               const SizedBox(height: 8),
               Text(_error!, style: TextStyle(color: colors.error)),
             ],
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             FilledButton.icon(
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(44),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+              ),
               onPressed: _busy || (_claimed && !canClaim)
                   ? null
                   : () => _request(claim: canClaim),
