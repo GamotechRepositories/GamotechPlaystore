@@ -1,0 +1,8 @@
+import { Link, useLocation } from 'react-router-dom';
+import useApi from '../lib/useApi';
+import { Heading, Feedback } from '../components/Shared';
+export default function Games() {
+  const state = useApi('/games');
+  const location = useLocation();
+  return <><Heading title="Games" description="Manage the game catalog shown in your app."><Link className="button" to="/games/new">+ Add game</Link></Heading>{location.state?.created && <p role="status" className="mb-4 rounded-lg bg-emerald-50 p-4 text-emerald-800">Game created successfully.</p>}<Feedback {...state}/>{state.data && <div className="panel overflow-hidden"><div className="border-b border-slate-100 p-4 font-semibold">Game catalog · {state.data.games.length}</div><div className="overflow-x-auto"><table><thead><tr><th>Game</th><th>Description</th><th>Play URL</th><th>Display order</th></tr></thead><tbody>{state.data.games.map(game => <tr key={game._id}><td><div className="flex min-w-36 items-center gap-3"><img src={game.imageUrl} alt="" className="h-10 w-10 rounded-lg bg-slate-100 object-cover" onError={event => { event.currentTarget.style.visibility = 'hidden'; }}/><span className="font-semibold">{game.name}</span></div></td><td className="max-w-72">{game.description || '—'}</td><td>{/^https?:\/\//i.test(game.linkUrl || '') ? <a className="text-emerald-700 underline" href={game.linkUrl} target="_blank" rel="noreferrer">Open game ↗</a> : '—'}</td><td>{game.sortOrder}</td></tr>)}{!state.data.games.length && <tr><td colSpan="4" className="text-center">No games yet. Add your first game to get started.</td></tr>}</tbody></table></div></div>}</>;
+}

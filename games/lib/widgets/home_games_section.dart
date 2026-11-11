@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
 
-class HomeGamesSection extends StatelessWidget {
-  const HomeGamesSection({super.key});
+import '../services/game_service.dart';
 
-  static const _games = [
-    (name: 'Ludo', icon: Icons.casino_rounded),
-    (name: 'Rummy', icon: Icons.style_rounded),
-    (name: 'Poker', icon: Icons.trip_origin_rounded),
-    (name: 'Teen Patti', icon: Icons.filter_3_rounded),
-  ];
+class HomeGamesSection extends StatefulWidget {
+  const HomeGamesSection({super.key, this.gameService});
+
+  final GameService? gameService;
+
+  @override
+  State<HomeGamesSection> createState() => _HomeGamesSectionState();
+}
+
+class _HomeGamesSectionState extends State<HomeGamesSection> {
+  late Future<List<Game>> _games;
+
+  @override
+  void initState() {
+    super.initState();
+    _games = (widget.gameService ?? GameService()).fetchGames();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,76 +35,140 @@ class HomeGamesSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        for (var row = 0; row < _games.length; row += 2) ...[
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (var column = 0; column < 2; column++) ...[
-                if (column > 0) const SizedBox(width: 12),
-                Expanded(
-                  child: Card(
-                    margin: EdgeInsets.zero,
-                    clipBehavior: Clip.antiAlias,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      side: const BorderSide(
-                        color: Color(0xFF141414),
-                        width: 1.5,
+        FutureBuilder<List<Game>>(
+          future: _games,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const Padding(
+                padding: EdgeInsets.all(24),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    semanticsLabel: 'Loading games',
+                  ),
+                ),
+              );
+            }
+            if (snapshot.hasError) {
+              final error = snapshot.error;
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Text(
+                        error is GameException
+                            ? error.message
+                            : 'Unable to load games. Please try again.',
+                        textAlign: TextAlign.center,
                       ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Container(
-                            height: 100,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  colors.primary.withValues(alpha: 0.3),
-                                  const Color(0xFF080808),
-                                ],
-                              ),
-                            ),
-                            child: ExcludeSemantics(
-                              child: Icon(
-                                _games[row + column].icon,
-                                color: colors.secondary,
-                                size: 48,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            _games[row + column].name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Coming soon',
-                            style: TextStyle(
-                              color: colors.onSurfaceVariant,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
+                      TextButton.icon(
+                        onPressed: () => setState(() {
+                          _games = (widget.gameService ?? GameService())
+                              .fetchGames();
+                        }),
+                        icon: const Icon(Icons.refresh_rounded),
+                        label: const Text('Retry'),
                       ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            final games = snapshot.data ?? [];
+            if (games.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.all(24),
+                child: Text(
+                  'No games available yet.',
+                  textAlign: TextAlign.center,
+                ),
+              );
+            }
+            return Column(
+              children: [
+                for (var row = 0; row < games.length; row += 2) ...[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(child: _GameCard(game: games[row])),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: row + 1 < games.length
+                            ? _GameCard(game: games[row + 1])
+                            : const SizedBox.shrink(),
+                      ),
+                    ],
+                  ),
+                  if (row + 2 < games.length) const SizedBox(height: 12),
+                ],
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _GameCard extends StatelessWidget {
+  const _GameCard({required this.game});
+  final Game game;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Card(
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: Color(0xFF141414), width: 1.5),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: AspectRatio(
+                aspectRatio: 4 / 3,
+                child: ColoredBox(
+                  color: colors.surfaceContainerHighest,
+                  child: Image.network(
+                    game.imageUrl,
+                    fit: BoxFit.cover,
+                    excludeFromSemantics: true,
+                    loadingBuilder: (context, child, progress) =>
+                        progress == null
+                        ? child
+                        : const Center(
+                            child: CircularProgressIndicator(
+                              semanticsLabel: 'Loading game image',
+                            ),
+                          ),
+                    errorBuilder: (context, error, stackTrace) => const Center(
+                      child: Icon(Icons.videogame_asset_rounded, size: 40),
                     ),
                   ),
                 ),
-              ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              game.name,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            if (game.description.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                game.description,
+                style: TextStyle(color: colors.onSurfaceVariant, fontSize: 12),
+              ),
             ],
-          ),
-          if (row + 2 < _games.length) const SizedBox(height: 12),
-        ],
-      ],
+          ],
+        ),
+      ),
     );
   }
 }

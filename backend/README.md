@@ -109,3 +109,36 @@ Bearer token. The server selects the amount; request amounts are ignored.
 `DAILY_BONUS_PAISE` defaults to `10000` (₹100). Claims reset at midnight India time.
 A unique wallet-and-day record reference prevents duplicate awards; repeat
 claims return 409. Missing wallets return 404. MongoDB must support transactions.
+
+## Games
+
+`POST /api/v1/games` creates a game. Send JSON such as:
+
+```json
+{
+  "name": "Ludo",
+  "imageUrl": "https://example.com/games/ludo.png",
+  "description": "Play Ludo with friends",
+  "linkUrl": "https://example.com/play/ludo",
+  "sortOrder": 0
+}
+```
+
+`name` (nonblank, max 200 characters) and `imageUrl` (absolute HTTP(S) URL)
+are required. `description` is optional (max 2000 characters, defaults to an
+empty string). `linkUrl` is an optional absolute HTTP(S) URL. `sortOrder`
+is an optional nonnegative safe integer, defaulting to zero. Unknown fields
+are ignored. Returns `201` with `{ "message": "Game created successfully", "game": {...} }`.
+Invalid input returns `400`; database failures return `500`.
+
+Fetch games in the app with `GET /api/v1/games`. Returns `200`:
+
+```json
+{ "message": "Games fetched successfully", "games": [] }
+```
+
+The array contains saved games including `_id`, `name`, `imageUrl`,
+`description`, optional `linkUrl`, `sortOrder`, and timestamps. Games are sorted
+by `sortOrder` ascending, then newest first with a stable ID tie breaker.
+An empty collection returns an empty array; database failures return `500`.
+These routes follow the existing unauthenticated home-banner convention.

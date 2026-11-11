@@ -1,0 +1,23 @@
+@import "tailwindcss";
+@layer base {
+  body { @apply m-0 bg-slate-50 text-xs text-slate-700 antialiased; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+  h1, h2, h3, input, textarea, select, button, table { @apply text-xs; }
+  button, a { @apply transition-colors; }
+  button { @apply cursor-pointer; }
+  button:disabled { @apply cursor-not-allowed opacity-50; }
+  :focus-visible { @apply outline-2 outline-offset-4 outline-emerald-700; }
+  label { @apply block font-medium text-slate-700; }
+  input, textarea { @apply mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-3 font-normal text-slate-800 placeholder:text-slate-400; }
+  th { @apply whitespace-nowrap bg-slate-50 px-5 py-3 text-left font-medium text-slate-500; }
+  td { @apply border-t border-slate-100 px-5 py-4; overflow-wrap: anywhere; }
+  table { @apply w-full border-collapse; }
+}
+@layer components {
+  .panel { @apply rounded-xl border border-slate-200 bg-white shadow-sm; }
+  .button { @apply inline-flex min-h-10 items-center justify-center rounded-lg border border-transparent bg-emerald-800 px-4 py-2 font-medium text-white hover:bg-emerald-900; }
+  .button.secondary { @apply border-slate-200 bg-white text-slate-600 hover:bg-slate-50; }
+  .badge { @apply inline-flex rounded-md px-2 py-1 font-medium; }
+  .credit { @apply bg-emerald-50 text-emerald-800; }
+  .debit { @apply bg-amber-50 text-amber-800; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
