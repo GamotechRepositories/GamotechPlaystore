@@ -1,6 +1,6 @@
 import Game from "../models/Game.js";
 
-export const createGame = async (req, res) => {
+const saveGame = (editing) => async (req, res) => {
   const { name, imageUrl, description, linkUrl, sortOrder } = req.body ?? {};
 
   if (
@@ -25,9 +25,18 @@ export const createGame = async (req, res) => {
   }
 
   try {
-    const game = await Game.create({ name, imageUrl, description, linkUrl, sortOrder });
-    return res.status(201).json({
-      message: "Game created successfully",
+    let game;
+    if (editing) {
+      if (!/^[a-f0-9]{24}$/i.test(req.params.id)) return res.status(400).json({ message: "Invalid game ID" });
+      game = await Game.findById(req.params.id);
+      if (!game) return res.status(404).json({ message: "Game not found" });
+      game.set({ name, imageUrl, description: description ?? "", linkUrl, sortOrder: sortOrder ?? 0 });
+      await game.save();
+    } else {
+      game = await Game.create({ name, imageUrl, description, linkUrl, sortOrder });
+    }
+    return res.status(editing ? 200 : 201).json({
+      message: editing ? "Game updated successfully" : "Game created successfully",
       game: game.toJSON(),
     });
   } catch (error) {
@@ -37,9 +46,12 @@ export const createGame = async (req, res) => {
         errors: Object.values(error.errors).map(({ message }) => message),
       });
     }
-    return res.status(500).json({ message: "Unable to create game" });
+    return res.status(500).json({ message: editing ? "Unable to update game" : "Unable to create game" });
   }
 };
+
+export const createGame = saveGame(false);
+export const updateGame = saveGame(true);
 
 export const getGames = async (_req, res) => {
   try {

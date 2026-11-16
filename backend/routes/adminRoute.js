@@ -4,6 +4,8 @@ import User from '../models/User.js';
 import Game from '../models/Game.js';
 import WalletRecord from '../models/WalletRecord.js';
 
+import { updateGame } from '../controllers/gameController.js';
+
 const router = Router();
 router.use((req, res, next) => {
   res.set('Cache-Control', 'no-store');
@@ -16,6 +18,7 @@ router.use((req, res, next) => {
   }
   next();
 });
+router.put('/games/:id', updateGame);
 router.get('/overview', async (_req, res) => {
   try {
     const [users, games, transactions] = await Promise.all([

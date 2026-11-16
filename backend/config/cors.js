@@ -21,6 +21,6 @@ export default cors({
 
     callback(null, localDevelopmentOrigin || allowedOrigins.includes(origin));
   },
-  methods: ["GET", "POST", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 });
