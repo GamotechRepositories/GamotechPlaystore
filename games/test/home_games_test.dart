@@ -45,6 +45,17 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.text('Chess'), findsOneWidget);
+      final images = tester.widgetList<Image>(find.byType(Image)).toList();
+      expect(
+        (images.first.image as NetworkImage).url,
+        'https://example.com/chess.png',
+      );
+      await tester.tap(find.text('Chess'));
+      await tester.pump();
+      expect(
+        find.text('This game is not available to play yet.'),
+        findsOneWidget,
+      );
       expect(find.text('Challenge a friend'), findsOneWidget);
       expect(find.text('Ludo'), findsOneWidget);
       expect(find.text('Poker'), findsOneWidget);

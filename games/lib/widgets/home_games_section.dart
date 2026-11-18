@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/game_service.dart';
+import '../screens/game_webview_screen.dart';
 
 class HomeGamesSection extends StatefulWidget {
   const HomeGamesSection({super.key, this.gameService});
@@ -86,20 +87,21 @@ class _HomeGamesSectionState extends State<HomeGamesSection> {
             }
             return Column(
               children: [
-                for (var row = 0; row < games.length; row += 2) ...[
+                for (var row = 0; row < games.length; row += 3) ...[
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(child: _GameCard(game: games[row])),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: row + 1 < games.length
-                            ? _GameCard(game: games[row + 1])
-                            : const SizedBox.shrink(),
-                      ),
+                      for (var column = 0; column < 3; column++) ...[
+                        if (column > 0) const SizedBox(width: 8),
+                        Expanded(
+                          child: row + column < games.length
+                              ? _GameCard(game: games[row + column])
+                              : const SizedBox.shrink(),
+                        ),
+                      ],
                     ],
                   ),
-                  if (row + 2 < games.length) const SizedBox(height: 12),
+                  if (row + 3 < games.length) const SizedBox(height: 8),
                 ],
               ],
             );
@@ -124,15 +126,31 @@ class _GameCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         side: const BorderSide(color: Color(0xFF141414), width: 1.5),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
+      child: InkWell(
+        onTap: () {
+          if (game.playUri == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('This game is not available to play yet.'),
+              ),
+            );
+            return;
+          }
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => GameWebViewScreen(game: game),
+            ),
+          );
+        },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
               child: AspectRatio(
-                aspectRatio: 4 / 3,
+                aspectRatio: 1,
                 child: ColoredBox(
                   color: colors.surfaceContainerHighest,
                   child: Image.network(
@@ -154,18 +172,31 @@ class _GameCard extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
-            Text(
-              game.name,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            if (game.description.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Text(
-                game.description,
-                style: TextStyle(color: colors.onSurfaceVariant, fontSize: 12),
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    game.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                  if (game.description.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      game.description,
+                      style: TextStyle(
+                        color: colors.onSurfaceVariant,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ],
               ),
-            ],
+            ),
           ],
         ),
       ),

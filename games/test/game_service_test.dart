@@ -13,6 +13,7 @@ void main() {
       'games': [
         {
           'name': 'Teen Patti',
+          'linkUrl': 'https://example.com/play/teen-patti',
           'imageUrl': 'https://example.com/teen-patti.png',
         },
         {'name': 'Ludo', 'imageUrl': 'https://example.com/ludo.png'},
@@ -32,6 +33,11 @@ void main() {
     final games = await service.fetchGames();
     expect(games.map((game) => game.name), ['Teen Patti', 'Ludo']);
     expect(games.first.imageUrl, 'https://example.com/teen-patti.png');
+    expect(
+      games.first.playUri.toString(),
+      'https://example.com/play/teen-patti',
+    );
+    expect(games.last.playUri, isNull);
 
     body = '{"games":[]}';
     expect(await service.fetchGames(), isEmpty);
@@ -49,6 +55,23 @@ void main() {
     status = 500;
     body = '<html>Proxy error</html>';
     await expectLater(service.fetchGames(), throwsA(isA<GameException>()));
+  });
+
+  test('only HTTP and HTTPS game links can be played', () {
+    for (final link in [
+      null,
+      '',
+      'javascript:alert(1)',
+      'file:///tmp/game',
+      'not-a-url',
+    ]) {
+      final game = Game.fromJson({
+        'name': 'Ludo',
+        'imageUrl': 'https://example.com/ludo.png',
+        'linkUrl': link,
+      });
+      expect(game.playUri, isNull);
+    }
   });
 
   test('rejects an invalid API base URL', () async {

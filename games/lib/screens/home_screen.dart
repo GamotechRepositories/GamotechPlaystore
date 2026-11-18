@@ -100,10 +100,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildHome(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final balance = _balance;
     return Scaffold(
       backgroundColor: const Color(0xFF080808),
       appBar: AppBar(
-        titleSpacing: 12,
+        leadingWidth: 48,
+        leading: IconButton(
+          tooltip: 'Profile',
+          iconSize: 30,
+          onPressed: () async {
+            final signOut = await Navigator.of(context).push<bool>(
+              MaterialPageRoute(
+                builder: (_) => Theme(
+                  data: Theme.of(context),
+                  child: ProfileScreen(session: session),
+                ),
+              ),
+            );
+            if (signOut == true && context.mounted) {
+              Navigator.of(context).pop();
+            }
+          },
+          icon: const Icon(Icons.account_circle_rounded),
+        ),
+        centerTitle: false,
+        titleSpacing: 0,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -123,13 +144,27 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
               ),
-              child: Text(
-                _balance == null
-                    ? 'Unavailable'
-                    : '${(_balance! / 100).toStringAsFixed(2)} coins',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: colors.secondary, fontSize: 11),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/coin.svg',
+                    width: 12,
+                    height: 12,
+                    excludeFromSemantics: true,
+                  ),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      balance == null
+                          ? 'Unavailable'
+                          : '${(balance / 100).toStringAsFixed(balance % 100 == 0 ? 0 : 2)} coins',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: colors.secondary, fontSize: 11),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -139,6 +174,8 @@ class _HomeScreenState extends State<HomeScreen> {
             width: 144,
             child: FilledButton(
               style: FilledButton.styleFrom(
+                backgroundColor: colors.secondary,
+                foregroundColor: Colors.black,
                 minimumSize: const Size(0, 32),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -217,21 +254,35 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           IconButton(
-            tooltip: 'Profile',
-            onPressed: () async {
-              final signOut = await Navigator.of(context).push<bool>(
-                MaterialPageRoute(
-                  builder: (_) => Theme(
-                    data: Theme.of(context),
-                    child: ProfileScreen(session: session),
+            tooltip: 'Notifications',
+            onPressed: () => showDialog<void>(
+              context: context,
+              builder: (dialogContext) => AlertDialog(
+                title: const Text('Notifications'),
+                content: const Text('No notifications yet.'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    child: const Text('Close'),
                   ),
+                ],
+              ),
+            ),
+            icon: Container(
+              width: 36,
+              height: 36,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: colors.secondary.withValues(alpha: 0.35),
                 ),
-              );
-              if (signOut == true && context.mounted) {
-                Navigator.of(context).pop();
-              }
-            },
-            icon: const Icon(Icons.account_circle_rounded),
+              ),
+              child: const Icon(
+                Icons.notifications_outlined,
+                color: Colors.white,
+              ),
+            ),
           ),
           const SizedBox(width: 8),
         ],

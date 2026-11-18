@@ -14,11 +14,22 @@ class Game {
     required this.name,
     required this.imageUrl,
     this.description = '',
+    this.linkUrl,
   });
 
   final String name;
   final String imageUrl;
   final String description;
+  final String? linkUrl;
+
+  Uri? get playUri {
+    final uri = Uri.tryParse(linkUrl ?? '');
+    return uri != null &&
+            uri.hasAuthority &&
+            ['http', 'https'].contains(uri.scheme)
+        ? uri
+        : null;
+  }
 
   factory Game.fromJson(Map<String, dynamic> json) {
     final name = json['name'];
@@ -39,6 +50,7 @@ class Game {
       name: name,
       imageUrl: imageUrl as String,
       description: description as String? ?? '',
+      linkUrl: json['linkUrl'] is String ? json['linkUrl'] as String : null,
     );
   }
 }

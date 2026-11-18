@@ -38,6 +38,7 @@ dependencies:
   flutter_dotenv: ^6.0.1
   shared_preferences: ^2.5.5
   flutter_svg: ^2.3.2
+  webview_flutter: ^4.14.1
 
 dev_dependencies:
   flutter_test:
@@ -73,6 +74,7 @@ flutter:
     - assets/images/card.png
     - assets/images/frd.png
     - assets/images/cup.png
+    - assets/images/box.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
